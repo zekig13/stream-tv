@@ -99,3 +99,12 @@ python -m app
 
 ### Lisans / kaynak
 Kanal listeleri [Public IPTV](https://publiciptv.com) üzerinden alınır. Bu uygulama bağımsız bir masaüstü istemcisidir.
+
+## Windows EXE
+
+Hazir paket: [releases/StreamTV.exe](releases/StreamTV.exe) (~20 MB)
+
+- Cift tikla calistir
+- Uygulama ici oynatma icin [VLC](https://www.videolan.org/vlc/) kurulu olmali
+- Kaynak koddan derlemek icin: `python -m PyInstaller StreamTV.spec` (veya README'deki pip yolu)
+
