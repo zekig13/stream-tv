@@ -321,6 +321,24 @@ class StreamTVApp(ctk.CTk):
         self.player.open_in_browser(ch.url)
         self.status.set_text("Tarayıcıda açıldı", T.SUCCESS)
 
+
+    def _open_current_in_system_vlc(self) -> None:
+        ch = self.player.current_channel
+        if not ch:
+            self.status.set_text("Önce bir kanal seçin", T.WARNING)
+            return
+        result = self.player.open_in_system_vlc(ch.url)
+        if result.ok:
+            self.now_playing.configure(text=ch.display_name)
+            self.play_status.configure(
+                text=f"▶  {ch.display_name} (VLC)",
+                text_color=T.SUCCESS,
+            )
+            self.status.set_text(result.message, T.SUCCESS)
+        else:
+            self.status.set_text(result.message, T.WARNING)
+            messagebox.showinfo("VLC", VLC_MISSING_TR)
+
     def _copy_current_url(self) -> None:
         ch = self.player.current_channel
         if not ch:

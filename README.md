@@ -2,13 +2,13 @@
 
 Stylish dark Windows desktop IPTV client that browses free country playlists from [publiciptv.com](https://publiciptv.com/countries) and plays streams via VLC.
 
-**Sürüm:** 1.1.0 · Türkçe arayüz · Modern koyu tema · Favoriler · Yerel önbellek
+**Sürüm:** 1.1.1 · Türkçe arayüz · Modern koyu tema · Favoriler · Yerel önbellek
 
 ---
 
-## Hazır Windows EXE (v1.1.0)
+## Hazır Windows EXE (v1.1.1)
 
-İndir: [releases/StreamTV.exe](https://github.com/zekig13/stream-tv/releases/download/v1.1.0/StreamTV.exe)  
+İndir: [releases/StreamTV.exe](https://github.com/zekig13/stream-tv/releases/download/v1.1.1/StreamTV.exe)  
 (alternatif: [repo içi kopya](https://github.com/zekig13/stream-tv/raw/main/releases/StreamTV.exe))
 
 ### SmartScreen uyarısı
