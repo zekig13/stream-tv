@@ -3,12 +3,32 @@
 from __future__ import annotations
 
 import json
+import sys
 import threading
 from pathlib import Path
 from typing import Any, Optional
 
-# Project root: .../stream-tv
-ROOT_DIR = Path(__file__).resolve().parents[2]
+from app.version import __version__
+
+
+def _writable_root() -> Path:
+    """Project root for source runs; next to the .exe (or AppData) when frozen."""
+    if getattr(sys, "frozen", False):
+        # Prefer a writable folder beside the EXE; fall back to LocalAppData
+        beside = Path(sys.executable).resolve().parent
+        try:
+            test = beside / ".streamtv_write_test"
+            test.write_text("ok", encoding="utf-8")
+            test.unlink(missing_ok=True)
+            return beside
+        except OSError:
+            base = Path.home() / "AppData" / "Local" / "StreamTV"
+            base.mkdir(parents=True, exist_ok=True)
+            return base
+    return Path(__file__).resolve().parents[2]
+
+
+ROOT_DIR = _writable_root()
 DATA_DIR = ROOT_DIR / "data"
 CACHE_DIR = ROOT_DIR / "cache"
 PLAYLIST_CACHE_DIR = CACHE_DIR / "playlists"
@@ -22,7 +42,8 @@ DEFAULT_COUNTRY = "tr"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/131.0.0.0 Safari/537.36 StreamTV/1.0"
+    "Chrome/131.0.0.0 Safari/537.36 "
+    f"StreamTV/{__version__}"
 )
 
 BASE_URL = "https://publiciptv.com"
@@ -74,8 +95,6 @@ class Settings:
                 encoding="utf-8",
             )
 
-    # --- settings accessors ---
-
     @property
     def last_country(self) -> str:
         return str(self._data.get("last_country") or DEFAULT_COUNTRY).lower()
@@ -109,8 +128,6 @@ class Settings:
             return float(self._data.get("cache_ttl_hours", 12))
         except (TypeError, ValueError):
             return 12.0
-
-    # --- favorites ---
 
     def get_favorites(self) -> list[dict[str, Any]]:
         with self._lock:

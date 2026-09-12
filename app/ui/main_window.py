@@ -18,6 +18,7 @@ from app.ui import theme as T
 from app.ui.channel_panel import ChannelPanel
 from app.ui.country_panel import CountryPanel
 from app.ui.widgets import StatusBar
+from app.version import APP_NAME, __version__
 
 
 class StreamTVApp(ctk.CTk):
@@ -41,7 +42,7 @@ class StreamTVApp(ctk.CTk):
     def _configure_window(self) -> None:
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
-        self.title("Stream TV")
+        self.title(f"{APP_NAME} v{__version__}")
         self.configure(fg_color=T.BG_ROOT)
         try:
             self.geometry(self.settings.geometry)
@@ -63,7 +64,7 @@ class StreamTVApp(ctk.CTk):
 
         brand = ctk.CTkLabel(
             top,
-            text="◈  Stream TV",
+            text=f"◈  {APP_NAME}",
             font=(T.FONT_FAMILY, 18, "bold"),
             text_color=T.TEXT_ACCENT,
         )
@@ -155,6 +156,17 @@ class StreamTVApp(ctk.CTk):
             command=self._copy_current_url,
         )
         self.copy_url_btn.pack(side="left", padx=4, pady=8)
+
+        self.system_vlc_btn = ctk.CTkButton(
+            playbar,
+            text="Sistem VLC",
+            width=110,
+            height=34,
+            fg_color=T.BG_CARD,
+            hover_color=T.ACCENT,
+            command=self._open_current_in_system_vlc,
+        )
+        self.system_vlc_btn.pack(side="left", padx=4, pady=8)
 
         self.play_status = ctk.CTkLabel(
             playbar,
@@ -266,7 +278,17 @@ class StreamTVApp(ctk.CTk):
             self.status.set_text(result.message, T.SUCCESS)
             return
 
-        # VLC missing or failed — Turkish dialog with fallbacks
+        # Prefer launching installed VLC.exe before showing the dialog
+        sys_result = self.player.open_in_system_vlc(channel.url)
+        if sys_result.ok:
+            self.play_status.configure(
+                text=f"▶  {channel.display_name} (VLC)",
+                text_color=T.SUCCESS,
+            )
+            self.now_playing.configure(text=channel.display_name)
+            self.status.set_text(sys_result.message, T.SUCCESS)
+            return
+
         self.play_status.configure(text=channel.display_name, text_color=T.WARNING)
         self.now_playing.configure(text=channel.display_name)
         choice = messagebox.askyesnocancel(
@@ -279,9 +301,7 @@ class StreamTVApp(ctk.CTk):
         )
         if choice is True:
             self.player.open_in_browser(channel.url)
-            # Also try system VLC exe as bonus
-            self.player.open_in_system_vlc(channel.url)
-            self.status.set_text("Tarayıcı / sistem oynatıcıya gönderildi", T.WARNING)
+            self.status.set_text("Tarayıcıda açıldı", T.WARNING)
         elif choice is False:
             self._copy_url(channel.url)
         else:
